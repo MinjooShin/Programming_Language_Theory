@@ -12,11 +12,11 @@ Type Definition
   ```racket
   (define-type type-id
       [variant_id1 (field_id11 contract_expr11)
-                              '''
+                              ...
                    (fleld_id1n contract_expr1n)]
-          '''
+          ...
       [variant_idm (field_idm1 contract_exprm1)
-                              '''
+                              ...
                    (fleld_idmn contract_exprmn)])
   ```
 
@@ -38,8 +38,9 @@ Type Definition
       ...
       [variant_idm (field_idm1 ...) exprm])
   ```
-- QnA
-    - symbol and identifier are different?
-        - symbol is considered with data and starts with a single quotation mark('), but the identifier is name like variable.  
+  QnA
+  --
+  - symbol and identifier are different?
+    - symbol is considered with data and starts with a single quotation mark('), but the identifier is name like variable.  
 
 
