@@ -4,7 +4,7 @@ Modeling Languages
 - By writing an interpreter, we can understand the language!
 - Interpreter can be converted into a compiler.
 ![image](https://github.com/MinjooShin/Programming_Language_Theory/assets/74174008/a75db489-a524-484f-af48-d6995b5d3226)
-
+--
 - Which one is most significant to learn PLT? 
   - Semantics is the most significant part because the primary role of language is communication.
 - Interpreter Semantics
