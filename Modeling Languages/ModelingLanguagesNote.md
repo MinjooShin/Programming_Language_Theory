@@ -50,6 +50,7 @@ Modeling Languages
 QnA:
   - why left-hand side and right-hand side are not number types?
     -  Each side might be num or add or sub that is, it may not be a number. So, it must be AE for all possibilities.
+
 Keyword:
   - Semantics: the behaviors associated with each syntax
   - Interpreter Semantics: A methodology that describes how programming languages should behave and defines how to interpret the language's statements and expressions
