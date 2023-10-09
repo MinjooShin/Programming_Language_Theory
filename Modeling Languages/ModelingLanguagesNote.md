@@ -46,11 +46,13 @@ Modeling Languages
       <num> ::= 1, 42, 17, ...
       ```
       - We can convert concrete syntax into abstract syntax and verify the abstract syntax we write using the BNF grammar of each language
+      
+QnA
 --
-QnA:
   - why left-hand side and right-hand side are not number types?
     -  Each side might be num or add or sub that is, it may not be a number. So, it must be AE for all possibilities.
+
+Keyword
 --
-Keyword:
   - Semantics: the behaviors associated with each syntax
   - Interpreter Semantics: A methodology that describes how programming languages should behave and defines how to interpret the language's statements and expressions
