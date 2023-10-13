@@ -98,3 +98,22 @@ Substitution
         ```
         {with {x 5} {+ x x}} -> {with {x 5} {+ 5 5}}
         ```
+      - No substitution 
+        - No substitutions occur since there are no instances of x in the expression.
+        - y: free identifier
+        ```
+        {with {x 5} {+ 10 y}}
+        ```
+      - Not Valid Substitution
+        ```
+        {with {x 5} {+ x {with {x 3} 10}}}
+        {with {x 5} {+ x {with {5 3} 10}}}
+        ```
+        - WAE in BNF
+        ```
+        {with {<id> <WAE>} <WAE>}
+        ```
+        Based on BNF, the above expression is syntactically illegal because the second binding x is not an identifier, it is just a value.
+      - So, we need other detailed definitions to make our algorithm for Substitution precisely
+      -  
+        
