@@ -91,29 +91,34 @@ Substitution
       [(? symbol?) (id sexp)]
       [else (error 'parse "bad syntax:~a" sexp)]
   ```
-  - How to deal with identifiers in the interpreter?
-    - Defining Substitution
-      - Definition 1 (Substitution)
-        - To substitute the identifier 'x' in the expression, replace all identifiers in the body that have the name 'x'.
-        ```
-        {with {x 5} {+ x x}} -> {with {x 5} {+ 5 5}}
-        ```
-      - No substitution 
-        - No substitutions occur since there are no instances of x in the expression.
-        - y: free identifier
-        ```
-        {with {x 5} {+ 10 y}}
-        ```
-      - Not Valid Substitution
-        ```
-        {with {x 5} {+ x {with {x 3} 10}}}
-        {with {x 5} {+ x {with {5 3} 10}}}
-        ```
-        - WAE in BNF
-        ```
-        {with {<id> <WAE>} <WAE>}
-        ```
-        Based on BNF, the above expression is syntactically illegal because the second binding x is not an identifier, it is just a value.
-      - So, we need other detailed definitions to make our algorithm for Substitution precisely
-      -  
-        
+- How to deal with identifiers in the interpreter?
+  -  Definition (Substitution)
+    - To substitute identifier 'x' in '{+ x {with {y 3} x}}' with the expression 5, replace all bound instances of 'x' and replace all free instances of 'x' in '{+ x {with {y 3} x}}' with 5.
+    ```racket
+    {with {x 5} {+ x {with {y 3} x}}}
+    ; after replacing all the identifiers 'x' -> the value is 10
+    {with {x 5} {+ 5 {with {y 3} 5}}} 
+    ```
+- Find Bound/Binding/Free instances and scopes of binding identifiers
+  - Free identifier: 정의만 되어 있는 경우
+  - Binding identifier: 정의되어 있고, 초기화된 경우
+  - Bound identifier: 정의되어 있고, 초기화된 identifier를 사용하는 경우
+  - Example1:
+    - First 'x' -> binding identifier (identifier 값이 5로 초기화됨)
+    - Second 'x' -> bound identifier  (5로 초기화된 identifier를 덧셈에 사용함)
+    - Third 'x' -> bound identifier
+      - '{with {y x} x}' 범위에서는 x가 정의되지 않았기 때문에 free identifier이지만, 전체 범위에서는 x는 5로 초기화되었기 때문에 bound identifier임
+  - Example2:
+    - First 'x' -> binding identifier
+    - Second 'x' -> bound identifier
+    - Third 'x' -> binding identifier
+      - The third identifier has the same name as the first identifier but, a different identifier.
+    - Fourth 'x' -> bound identifier in scope with '{with {x {+ x 1}} x}'
+    - Fifth 'x' -> bound identifier
+      - Fifth identifier는 third identifier 범위에 존재하기 때문에 third identifier 값이 fifth identifier에 bound됨    
+  ```racket
+  ; Example1
+  {with {x 5} {+ x {with {y x} x}}}
+  ; Example2
+  {with {x 5} {+ x {with {x {+ x 1}} x}}}
+  ```
