@@ -109,12 +109,12 @@ Substitution
     - Third 'x' -> bound identifier
       - '{with {y x} x}' 범위에서는 x가 정의되지 않았기 때문에 free identifier이지만, 전체 범위에서는 x는 5로 초기화되었기 때문에 bound identifier임
   - Example2:
-    - First 'x' -> binding identifier
-    - Second 'x' -> bound identifier
-    - Third 'x' -> binding identifier
+    - First 'x' -> binding identifier (5로 초기화됨)
+    - Second 'x' -> bound identifier (전체 with 범위에서 첫번째 identifier 값인 5가 bound됨)
+    - Third 'x' -> binding identifier (6으로 초기화됨)
       - The third identifier has the same name as the first identifier but, a different identifier.
-    - Fourth 'x' -> bound identifier in scope with '{with {x {+ x 1}} x}'
-    - Fifth 'x' -> bound identifier
+    - Fourth 'x' -> bound identifier (전체 with 범위에서 첫번째 identifier 값인 5가 bound됨)
+    - Fifth 'x' -> bound identifier (두번째 with 범위에서 세번째 identifier 값인 6이 bound됨)
       - Fifth identifier는 third identifier 범위에 존재하기 때문에 third identifier 값이 fifth identifier에 bound됨    
   ```racket
   ; Example1
