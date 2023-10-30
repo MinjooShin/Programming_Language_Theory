@@ -41,8 +41,8 @@ RCFAE: Concrete Syntax
    | <id>
    | {fun {<id>} <RCFAE>}
    | {<RCFAE> <RCFAE>}
-   | **{if0 <RCFAE> <RCFAE> RCFAE>}**
-   | **{rec {<id> <RCFAE>} <RCFAE>}**
+   | {if0 <RCFAE> <RCFAE> RCFAE>}
+   | {rec {<id> <RCFAE>} <RCFAE>}
   ```
 
 Example
@@ -96,21 +96,56 @@ Implementing RCFAE interpreter
      [if0 (test-expr then-expr else-expr) ...]
      [rec (bound-id named-expr fst-call) ...]))
   ```
-if0 condition
+**if0 condition**
   - Abstract Syntax
     - If test-expr is 0, the next step executed is the then-expr part otherwise, else-expr.
     ```
     [if0 (test-expr RCFAE?) (then-expr RCFAE?) (else-expr RCFAE?)]
     ```
   - Interpreter
-    - We have to check whether the test-expr is zero or not.
+    - We have to check whether the test-expr is zero or not and whether the type of value is RCFAE value type or not because the interpreter returns the RCFAE-value type.
+    - So, we should implement a helper function, numzero?
     ```racket
     [if0 (test-expr then-expr else-expr)
          (if (numzero? (interp test-expr ds))
          (interp then-expr ds)
          (interp else-expr ds))]
 
+    ;numzero?: RCFAE-Value -> boolean
+    (define (numzero? n) (zero? (numV-n n)))
     ```
+
+**rec**
+  - Interpreter
+    ```racket
+    ; interp : RCFAE DefrdSub -> RCFAE-Value
+    (define (interp rcfae ds)
+     (type-case RCFAE rcfae
+     …
+     [rec (bound-id named-expr fst-call)
+     (interp fst-call
+       (aSub bound-id
+         (interp named-expr ds)
+         ds))]
+    ```
+    - Problem: We can't interpret the deferred substitution cache because the bound-id is used in name-expr.
+    - Solution: we can create another type of cache only for the recursion.
+
+    - New type for the recursion cache
+      ```racket
+        RCFAE: DefrdSub
+        (define-type DefrdSub
+         [mtSub]
+         [aSub (name symbol?)
+               (value RCFAE-Value?)
+               (ds DefrdSub?)]
+         [aRecSub (name symbol?)
+                  (value-box (box/c RCFAE-Value?))
+                  (ds DefrdSub?)])
+        (define-type RCFAE-Value
+         [numV (n number?)]
+         [closureV (param Symbol?) (body RCFAE?) (ds DefrdSub?)])
+      ```
     
 Example Run
 
