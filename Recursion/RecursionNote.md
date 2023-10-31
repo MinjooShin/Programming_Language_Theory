@@ -233,13 +233,3 @@ Example Run
     - (interp fun-expr new-ds) = (closureV 'n (if0 n 0 (+ 1 (count (- n 1)))) new-ds)
     - value-holder = [(closureV 'n '{if0 n 0 {+ 1 {count {- n 1}}}} new-ds)]
   4. app branch
-
- 
-
-   
-
-
-Possible Exam Questions (at least two questions with answers):
-
-
-
