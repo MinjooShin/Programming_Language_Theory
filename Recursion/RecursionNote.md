@@ -130,8 +130,10 @@ Implementing RCFAE interpreter
     ```
     - Problem: We can't interpret the deferred substitution cache because the bound-id is used in name-expr.
     - Solution: we can create another type of cache only for the recursion.
-
     - New type for the recursion cache
+      - aRecSub uses a box for updating our cache, unlike aSub.
+        - Because we have to know binding information which is not created yet.
+        - We just create empty binding information(outline) first. it is actually a cache for recursion but we don't know about bounded value.
       ```racket
         RCFAE: DefrdSub
         (define-type DefrdSub
