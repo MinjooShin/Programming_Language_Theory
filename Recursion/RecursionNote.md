@@ -131,10 +131,7 @@ Implementing RCFAE interpreter
     - Problem: We can't interpret the deferred substitution cache because the bound-id is used in name-expr.
     - Solution: we can create another type of cache only for the recursion.
     - New type for the recursion cache
-      - aRecSub uses a box for updating our cache, unlike aSub.
-        - Because we have to know binding information which is not created yet.
-        - We just create empty binding information(outline) first. it is actually a cache for recursion but we don't know about bounded value.
-      ```racket
+     ```racket
         RCFAE: DefrdSub
         (define-type DefrdSub
          [mtSub]
@@ -148,8 +145,99 @@ Implementing RCFAE interpreter
          [numV (n number?)]
          [closureV (param Symbol?) (body RCFAE?) (ds DefrdSub?)])
       ```
-    
-Example Run
+      - aRecSub uses a box for updating our cache, unlike aSub.
+        - Because we have to know binding information which is not created yet.
+        - We just create empty binding information(outline) first. it is actually a cache for recursion but we don't know about bounded value.
+        - That is when we create the actual cache then we update this area later.
+        - So, currently, our binding information contains incorrect information because it is empty.
+        - Later, when we actually conduct binding id we update the empty part.
+    ```racket
+    ; interp : RCFAE DefrdSub -> RCFAE-Value
+    (define (interp rcfae ds)
+      (type-case RCFAE rcfae
+        ...
+        [rec (bound-id named-expr fst-call)
+          (local [(define value-holder (box (numV 198)))
+                  (define new-ds (aRecSub bound-id
+                                          value-holder
+                                          ds))]
+            ... (interp named-expr new-ds)
+            ... (interp fst-call new-ds) ...]))
+    ```
+    - aRecSub: name of the cache we create
+    - bound-id: count
+    - value-holder: dummy value
+    - name-expr: function body(function definition)
+    - new-ds: new deferred substitution cache for function definition
+      - Function contains the recursive function name.
+      - We have to access the new deferred substitution cache, not ds.
+      - if we provide just the same ds, it does not contain any binding information for the recursive function.
+    - Why do we need a Dummy value?
+      - Before creating our cache we need to create binding information.
+      - So, we can put the dummy value and any number is ok.
+- Final Interpreter
+  ```racket
+  ; interp : RCFAE DefrdSub -> RCFAE-Value
+  (define (interp rcfae ds)
+    (type-case RCFAE rcfae
+      ...
+      [fun (param body-expr) (closureV param body-expr ds)]
+      ...
+      [rec (bound-id named-expr fst-call)
+        (local [(define value-holder (box (numV 198)))
+                (define new-ds (aRecSub bound-id
+                                        value-holder ds))]
+          (begin
+            (set-box! value-holder (interp named-expr new-ds))
+            (interp fst-call new-ds)))]))
+  ```
+
+- Updating the lookup function
+  ```racket
+  ; lookup : symbol DefrdSub -> RCFAE-Value
+  (define (lookup name ds)
+    (type-case DefrdSub ds
+      [mtSub () (error ’lookup "free variable")]
+      [aSub (sub-name val rest-ds)
+            (if (symbol=? sub-name name)
+                val
+                (lookup name rest-ds))]
+      [aRecSub (sub-name val-box rest-ds)
+               (if (symbol=? sub-name name)
+                   (unbox val-box)
+                   (lookup name rest-ds))]))
+  ```
+
+Example Run 
+```racket
+  [rec (f fun-expr fst-call)
+    (local [(define value-holder (box (numV 198)))
+            (define new-ds (aRecSub f value-holder ds))]
+      (begin
+        (set-box! value-holder (interp fun-expr new-ds))
+        (interp fst-call new-ds)))]
+  
+  (run '{rec {count {fun {n} {if0 n 0 {+ 1 {count {- n 1}}}}}}
+          {count 8}} (mtSub))
+```
+- Execution Flow
+  1. rec branch
+    (1) f = count
+    (2) fun-expr = {fun {n} {if0 n 0 {+ 1 {count {- n 1}}}}}}
+    (3) fst-call = {count 8}
+    (4) value-holder = [numV 198]
+    (5) new-ds = (aRecSub 'count value-holder (mtSub))
+      => We got the new deferred substitution cache for recursion with the current value-holder as a dummy value.
+    (6) (interp fun-expr new-ds) = closureV
+  2. fun branch
+    (1) (interp fun-expr new-ds) = (closureV 'n (if0 n 0 (+ 1 (count (- n 1)))) new-ds)
+    (2) value-holder = [(closureV 'n '{if0 n 0 {+ 1 {count {- n 1}}}} new-ds)]
+  3. app branch
+
+ 
+
+   
+
 
 Possible Exam Questions (at least two questions with answers):
 
