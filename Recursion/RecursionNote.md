@@ -222,17 +222,17 @@ Example Run
 ```
 - Execution Flow
   1. rec branch
-    (1) f = count
-    (2) fun-expr = {fun {n} {if0 n 0 {+ 1 {count {- n 1}}}}}}
-    (3) fst-call = {count 8}
-    (4) value-holder = [numV 198]
-    (5) new-ds = (aRecSub 'count value-holder (mtSub))
+    - f = count
+    - fun-expr = {fun {n} {if0 n 0 {+ 1 {count {- n 1}}}}}}
+    - fst-call = {count 8}
+    - value-holder = [numV 198]
+    - new-ds = (aRecSub 'count value-holder (mtSub))
       => We got the new deferred substitution cache for recursion with the current value-holder as a dummy value.
-    (6) (interp fun-expr new-ds) = closureV
-  2. fun branch
-    (1) (interp fun-expr new-ds) = (closureV 'n (if0 n 0 (+ 1 (count (- n 1)))) new-ds)
-    (2) value-holder = [(closureV 'n '{if0 n 0 {+ 1 {count {- n 1}}}} new-ds)]
-  3. app branch
+    - (interp fun-expr new-ds) = closureV
+  3. fun branch
+    - (interp fun-expr new-ds) = (closureV 'n (if0 n 0 (+ 1 (count (- n 1)))) new-ds)
+    - value-holder = [(closureV 'n '{if0 n 0 {+ 1 {count {- n 1}}}} new-ds)]
+  4. app branch
 
  
 
